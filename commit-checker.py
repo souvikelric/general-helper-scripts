@@ -17,13 +17,29 @@ headers = {
 today = datetime.now(timezone.utc).date()
 
 def get_all_repos():
-    repo_url = f"{API_BASE}/user/repos"
-    response = requests.get(repo_url, headers=headers,params={"per_page": 100})
-    response.raise_for_status()
-    data = response.json()
-    for d in data:
-        print(d["name"])
-    print("Number of repos : " + str(len(data)))
+    repos = []
+    page = 1
+
+    while True:
+        response = requests.get(
+            f"{API_BASE}/user/repos",
+            headers=headers,
+            params={"per_page": 100, "page": page,"sort":"updated"},
+        )
+        response.raise_for_status()
+
+        data = response.json()
+        if not data:
+            break
+
+        repos.extend(data)
+        page += 1
+
+    for repo in repos:
+        print(repo["name"])
+
+    print("Number of repos:", len(repos))
+
 
 def get_today_commits():
     url = f"{API_BASE}/search/commits"
