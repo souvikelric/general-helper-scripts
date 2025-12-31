@@ -45,6 +45,14 @@ def get_all_repos():
     print("Number of repos:", len(repos))
     return today_repos
 
+def get_repo_commit(repo_name):
+    url = f"{API_BASE}/repos/{GITHUB_USERNAME}/{repo_name}/commits"
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    commits = response.json()
+    return commits
+
 
 def get_today_commits():
     url = f"{API_BASE}/search/commits"
