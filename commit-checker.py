@@ -5,6 +5,8 @@ import os
 
 GITHUB_USERNAME = "souvikelric"
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
+API_BASE = "https://api.github.com"
+
 
 
 headers = {
@@ -14,8 +16,17 @@ headers = {
 
 today = datetime.now(timezone.utc).date()
 
+def get_all_repos():
+    repo_url = f"{API_BASE}/user/repos"
+    response = requests.get(repo_url, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+    for d in data:
+        print(d["name"])
+    print("Number of repos : " + str(len(data)))
+
 def get_today_commits():
-    url = "https://api.github.com/search/commits"
+    url = f"{API_BASE}/search/commits"
     query = f"author:{GITHUB_USERNAME} committer-date:{today}"
 
     params = {
@@ -40,5 +51,6 @@ def get_today_commits():
 
 
 if __name__ == "__main__":
-    get_today_commits()
+    #get_today_commits()
+    get_all_repos()
 
