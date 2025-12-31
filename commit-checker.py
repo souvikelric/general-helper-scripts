@@ -18,7 +18,7 @@ today = datetime.now(timezone.utc).date()
 
 def get_all_repos():
     repo_url = f"{API_BASE}/user/repos"
-    response = requests.get(repo_url, headers=headers)
+    response = requests.get(repo_url, headers=headers,params={"per_page": 100})
     response.raise_for_status()
     data = response.json()
     for d in data:
