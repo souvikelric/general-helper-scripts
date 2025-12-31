@@ -32,10 +32,9 @@ def get_today_commits():
     for commit in commits:
         repo = commit["repository"]["full_name"]
         message = commit["commit"]["message"].split("\n")[0]
-        sha = commit["sha"][:7]
-        date = commit["commit"]["committer"]["date"]
+        date = commit["commit"]["committer"]["date"].split("T")[1].split(".")[0]
 
-        print(f"- [{repo}] {sha} | {message} ({date})")
+        print(f"- [{repo}] | {message} ({date})")
 
     print(f"\nTotal commits today: {len(commits)}")
 
