@@ -19,6 +19,7 @@ today = datetime.now(timezone.utc).date()
 def get_all_repos():
     repos = []
     page = 1
+    today_repos = []
 
     while True:
         response = requests.get(
@@ -34,11 +35,15 @@ def get_all_repos():
 
         repos.extend(data)
         page += 1
-
+    today = datetime.today().strftime("%Y-%m-%d")
     for repo in repos:
-        print(repo["name"])
+        if repo["updated_at"].split("T")[0] != today:
+            continue
+        print(repo["name"] + " | " + repo["updated_at"].split("T")[0])
+        today_repos.append(repo["name"])
 
     print("Number of repos:", len(repos))
+    return today_repos
 
 
 def get_today_commits():
@@ -68,5 +73,6 @@ def get_today_commits():
 
 if __name__ == "__main__":
     #get_today_commits()
-    get_all_repos()
+    print(get_all_repos())
+
 
