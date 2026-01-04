@@ -14,7 +14,7 @@ headers = {
     "Accept": "application/vnd.github+json",
 }
 
-today = datetime.now(timezone.utc).date()
+today = datetime.today().strftime("%Y-%m-%d")
 
 def get_all_repos():
     repos = []
@@ -35,14 +35,14 @@ def get_all_repos():
 
         repos.extend(data)
         page += 1
-    today = datetime.today().strftime("%Y-%m-%d")
+    
+    print("\033[32mRepos Contributed to today\033[0m")
     for repo in repos:
         if repo["updated_at"].split("T")[0] != today:
             continue
-        print(repo["name"] + " | " + repo["updated_at"].split("T")[0])
+        print(repo["name"])
         today_repos.append(repo["name"])
-
-    print("Number of repos:", len(repos))
+    print()
     return today_repos
 
 def get_repo_commits(repo_name):
@@ -95,11 +95,19 @@ def get_today_commits():
 
 
 if __name__ == "__main__":
-    #get_today_commits()
     repos = get_all_repos()
+    print("\033[32mAll commits for today\033[0m")
+    all_repo_commits = 0
     for r in repos:
         commits = get_repo_commits(r)
         for c in commits:
-            print(c["commit"]["message"])
+            if c["commit"]["committer"]["date"].split("T")[0] != today:
+                continue
+            print(r + " | " + c["commit"]["message"] + " | " + c["commit"]["committer"]["date"].split("T")[0])
+            all_repo_commits += 1
+    print()
+    print("\033[32mTotal Commits for today : " + str(all_repo_commits) + "\033[0m")
+    print()
+    
 
 
