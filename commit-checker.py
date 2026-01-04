@@ -45,13 +45,28 @@ def get_all_repos():
     print("Number of repos:", len(repos))
     return today_repos
 
-def get_repo_commit(repo_name):
+def get_repo_commits(repo_name):
     url = f"{API_BASE}/repos/{GITHUB_USERNAME}/{repo_name}/commits"
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
+    page_num = 1
+    all_commits = []
 
-    commits = response.json()
-    return commits
+    while True:
+        response = requests.get(
+            url,
+            headers=headers,
+            params={"per_page": 100, "page": page_num},
+        )
+        response.raise_for_status()
+
+        commits = response.json()
+
+        if not commits:  # no more pages
+            break
+
+        all_commits.extend(commits)
+        page_num += 1
+
+    return all_commits
 
 
 def get_today_commits():
@@ -81,6 +96,10 @@ def get_today_commits():
 
 if __name__ == "__main__":
     #get_today_commits()
-    print(get_all_repos())
+    repos = get_all_repos()
+    for r in repos:
+        commits = get_repo_commits(r)
+        for c in commits:
+            print(c["commit"]["message"])
 
 
