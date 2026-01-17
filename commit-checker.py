@@ -15,8 +15,8 @@ class bgColors():
     cyan = "\033[96m"
 
 
-def print_helper(message: str, color: str = bgColors.magenta) -> str:
-    print(color + message + "\033[0m")
+def print_helper(message: str, color: str = bgColors.magenta) -> None:
+    print(color + message + bgColors.reset)
 
 
 #GITHUB_USERNAME = "souvikelric"
@@ -44,7 +44,7 @@ def get_all_repos():
             params={"per_page": 100, "page": page,"sort":"updated"},
         )
         if response.status_code >= 400:
-            print("Error in getting response, check username")
+            print_helper("Error in getting response, check username", bgColors.red)
             exit(1)
         response.raise_for_status()
 
@@ -76,7 +76,7 @@ def get_repo_commits(repo_name):
             params={"per_page": 100, "page": page_num},
         )
         if response.status_code >= 400:
-            print("Error in getting response, check username")
+            print_helper("Error in getting response, check username", bgColors.red)
             exit(1)
         response.raise_for_status()
 
