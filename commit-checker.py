@@ -5,6 +5,7 @@ import sys
 import requests
 from datetime import datetime
 import os
+import argparse
 
 from utils import bgColors, print_helper
 
@@ -28,7 +29,7 @@ def get_all_repos():
         response = requests.get(
             f"{API_BASE}/user/repos",
             headers=headers,
-            params={"per_page": 100, "page": page,"sort":"updated"},
+            params={"per_page": 100, "page": page,"sort":"updated","since":f"{today}T00:00:00Z"},
         )
         if response.status_code >= 400:
             print_helper("Error in getting response, check username", bgColors.red)
@@ -104,16 +105,15 @@ def get_today_commits():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "--username":
-        #check if value is passed for second argument
-        if len(sys.argv) > 2:
-            GITHUB_USERNAME = sys.argv[2]
-        else:
-            print_helper("Please pass value of username after --username", bgColors.red)
-            exit(1)
-    elif len(sys.argv) > 1:
-        print_helper("Invalid argument",bgColors.red)
-        exit(1)
+    #use argparse library instead
+    #check if username is passed as argument
+
+    parser = argparse.ArgumentParser(description="Check daily commits")
+    parser.add_argument("--username", help="GitHub username to check")
+    args = parser.parse_args()
+
+    if args.username:
+        GITHUB_USERNAME = args.username
     else:
         GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
 
