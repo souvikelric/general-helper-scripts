@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timezone
 import os
 
-GITHUB_USERNAME = "souvikelric"
+#GITHUB_USERNAME = "souvikelric"
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 API_BASE = "https://api.github.com"
 
@@ -96,7 +96,7 @@ def get_today_commits():
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == "--username":
+    if len(sys.argv) > 1 and sys.argv[1] == "--username":
         #check if value is passed for second argument
         if len(sys.argv) > 2:
             GITHUB_USERNAME = sys.argv[2]
@@ -106,7 +106,8 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         print("Invalid argument")
         exit(1)
-    
+    else:
+        GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
 
     repos = get_all_repos()
     print("\033[32mAll commits for today\033[0m")
