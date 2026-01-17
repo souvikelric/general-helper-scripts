@@ -1,11 +1,22 @@
 # a simple python script that shows total number of commits in your own github account
+from dataclasses import dataclass
 import sys
 import requests
 from datetime import datetime, timezone
 import os
 
-def print_helper(message: str) -> str:
-    print("\033[32m" + message + "\033[0m")
+@dataclass
+class bgColors():
+    green = "\033[32m"
+    red = "\033[31m"
+    reset = "\033[0m"
+    yellow = "\033[93m"
+    magenta = "\033[95m"
+    cyan = "\033[96m"
+
+
+def print_helper(message: str, color: str = bgColors.magenta) -> str:
+    print(color + message + "\033[0m")
 
 
 #GITHUB_USERNAME = "souvikelric"
@@ -44,7 +55,7 @@ def get_all_repos():
         repos.extend(data)
         page += 1
     
-    print("\033[32mRepos Contributed to today\033[0m")
+    print_helper("Repos Contributed to today")
     for repo in repos:
         if repo["updated_at"].split("T")[0] != today:
             continue
