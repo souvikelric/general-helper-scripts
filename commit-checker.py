@@ -4,6 +4,10 @@ import requests
 from datetime import datetime, timezone
 import os
 
+def print_helper(message: str) -> str:
+    print("\033[32m" + message + "\033[0m")
+
+
 #GITHUB_USERNAME = "souvikelric"
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 API_BASE = "https://api.github.com"
@@ -28,6 +32,9 @@ def get_all_repos():
             headers=headers,
             params={"per_page": 100, "page": page,"sort":"updated"},
         )
+        if response.status_code >= 400:
+            print("Error in getting response, check username")
+            exit(1)
         response.raise_for_status()
 
         data = response.json()
@@ -57,6 +64,9 @@ def get_repo_commits(repo_name):
             headers=headers,
             params={"per_page": 100, "page": page_num},
         )
+        if response.status_code >= 400:
+            print("Error in getting response, check username")
+            exit(1)
         response.raise_for_status()
 
         commits = response.json()
@@ -110,7 +120,7 @@ if __name__ == "__main__":
         GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
 
     repos = get_all_repos()
-    print("\033[32mAll commits for today\033[0m")
+    print_helper("All commits for today")
     all_repo_commits = 0
     for r in repos:
         commits = get_repo_commits(r)
@@ -120,8 +130,6 @@ if __name__ == "__main__":
             print(r + " | " + c["commit"]["message"] + " | " + c["commit"]["committer"]["date"].split("T")[0])
             all_repo_commits += 1
     print()
-    print("\033[32mTotal Commits for today : " + str(all_repo_commits) + "\033[0m")
+    print_helper(f"Total commits today: {all_repo_commits}")
     print()
     
-
-
