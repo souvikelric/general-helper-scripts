@@ -8,13 +8,9 @@ import os
 
 from utils import bgColors, print_helper
 
-
-
 #GITHUB_USERNAME = "souvikelric"
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 API_BASE = "https://api.github.com"
-
-
 
 headers = {
     "Authorization": f"token {GITHUB_TOKEN}",
@@ -113,10 +109,10 @@ if __name__ == "__main__":
         if len(sys.argv) > 2:
             GITHUB_USERNAME = sys.argv[2]
         else:
-            print("Please pass value of username after --username")
+            print_helper("Please pass value of username after --username", bgColors.red)
             exit(1)
     elif len(sys.argv) > 1:
-        print("Invalid argument")
+        print_helper("Invalid argument",bgColors.red)
         exit(1)
     else:
         GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
