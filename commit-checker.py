@@ -1,4 +1,6 @@
 # a simple python script that shows total number of commits in your own github account
+
+
 from dataclasses import dataclass
 import sys
 import requests
@@ -59,7 +61,7 @@ def get_all_repos():
     for repo in repos:
         if repo["updated_at"].split("T")[0] != today:
             continue
-        print(repo["name"])
+        print_helper(repo["name"],bgColors.yellow)
         today_repos.append(repo["name"])
     print()
     return today_repos
@@ -138,7 +140,7 @@ if __name__ == "__main__":
         for c in commits:
             if c["commit"]["committer"]["date"].split("T")[0] != today:
                 continue
-            print(r + " | " + c["commit"]["message"] + " | " + c["commit"]["committer"]["date"].split("T")[0])
+            print_helper(r + " | " + c["commit"]["message"] + " | " + c["commit"]["committer"]["date"].split("T")[0],bgColors.cyan)
             all_repo_commits += 1
     print()
     print_helper(f"Total commits today: {all_repo_commits}")
