@@ -1,4 +1,5 @@
 # a simple python script that shows total number of commits in your own github account
+import sys
 import requests
 from datetime import datetime, timezone
 import os
@@ -95,6 +96,18 @@ def get_today_commits():
 
 
 if __name__ == "__main__":
+    if sys.argv[1] == "--username":
+        #check if value is passed for second argument
+        if len(sys.argv) > 2:
+            GITHUB_USERNAME = sys.argv[2]
+        else:
+            print("Please pass value of username after --username")
+            exit(1)
+    elif len(sys.argv) > 1:
+        print("Invalid argument")
+        exit(1)
+    
+
     repos = get_all_repos()
     print("\033[32mAll commits for today\033[0m")
     all_repo_commits = 0
