@@ -3,7 +3,7 @@
 
 import sys
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import argparse
 
@@ -18,7 +18,14 @@ headers = {
     "Accept": "application/vnd.github+json",
 }
 
-today = datetime.today().strftime("%Y-%m-%d")
+def get_local_midnight_utc():
+    """Returns the ISO 8601 string for local midnight in UTC."""
+    return datetime.now().astimezone().replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+def is_today(utc_date_str):
+    """Checks if a UTC ISO date string corresponds to today in local time."""
+    utc_dt = datetime.strptime(utc_date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    return utc_dt.astimezone().date() == datetime.now().date()
 
 def get_all_repos():
     repos = []
@@ -29,7 +36,7 @@ def get_all_repos():
         response = requests.get(
             f"{API_BASE}/user/repos",
             headers=headers,
-            params={"per_page": 100, "page": page,"sort":"updated","since":f"{today}T00:00:00Z"},
+            params={"per_page": 100, "page": page,"sort":"updated","since":get_local_midnight_utc()},
         )
         if response.status_code >= 400:
             print_helper("Error in getting response, check username", bgColors.red)
@@ -45,23 +52,27 @@ def get_all_repos():
     
     print_helper("Repos Contributed to today")
     for repo in repos:
-        if repo["updated_at"].split("T")[0] != today:
+        if not is_today(repo["updated_at"]):
             continue
         print_helper(repo["name"],bgColors.yellow)
         today_repos.append(repo["name"])
     print()
     return today_repos
 
-def get_repo_commits(repo_name):
+def get_repo_commits(repo_name, since=None):
     url = f"{API_BASE}/repos/{GITHUB_USERNAME}/{repo_name}/commits"
     page_num = 1
     all_commits = []
+    params = {"per_page": 100, "page": page_num}
+    if since:
+        params["since"] = since
 
     while True:
+        params["page"] = page_num
         response = requests.get(
             url,
             headers=headers,
-            params={"per_page": 100, "page": page_num},
+            params=params,
         )
         if response.status_code >= 400:
             print_helper("Error in getting response, check username", bgColors.red)
@@ -80,6 +91,7 @@ def get_repo_commits(repo_name):
 
 
 def get_today_commits():
+    today = datetime.today().strftime("%Y-%m-%d")
     url = f"{API_BASE}/search/commits"
     query = f"author:{GITHUB_USERNAME} committer-date:{today}"
 
@@ -121,9 +133,9 @@ if __name__ == "__main__":
     print_helper("All commits for today")
     all_repo_commits = 0
     for r in repos:
-        commits = get_repo_commits(r)
+        commits = get_repo_commits(r, since=get_local_midnight_utc())
         for c in commits:
-            if c["commit"]["committer"]["date"].split("T")[0] != today:
+            if not is_today(c["commit"]["committer"]["date"]):
                 continue
             print_helper(r + " | " + c["commit"]["message"] + " | " + c["commit"]["committer"]["date"].split("T")[0],bgColors.cyan)
             all_repo_commits += 1
